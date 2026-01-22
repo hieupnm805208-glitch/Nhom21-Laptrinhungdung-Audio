@@ -1,0 +1,9 @@
+[Aa]bin/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.log
+*.tmp
+.gemini/
+brain/
