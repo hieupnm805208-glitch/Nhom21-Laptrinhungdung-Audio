@@ -1,28 +1,23 @@
-# Nhóm 21 - V-CORE Messenger 🚀
+# NHOM21 FINANCIAL TERMINAL �
 
-Ứng dụng truyền thông nội bộ dựa trên kiến trúc **TCP Socket bất đồng bộ** (Asynchronous TCP Socket).
+Hệ thống Phân phối dữ liệu tài chính thời gian thực dựa trên kiến trúc TCP Socket.
 
-## 📝 Giới thiệu
-V-CORE Messenger là một giải pháp chat desktop standalone, tập trung vào việc tối ưu hóa hiệu suất truyền tin trong mạng nội bộ (LAN). Dự án sử dụng mô hình Client-Server thuần túy với giao thức nhị phân tự định nghĩa (Custom Binary Protocol) để đảm bảo tốc độ và tính bảo mật ở mức thấp.
+## 🏢 1. Giới Thiệu
+Nhom21 Financial Terminal là một hệ thống mô phỏng sàn giao dịch chứng khoán. Server đóng vai trò là "Sàn giao dịch tập trung" tự động giả lập các chỉ số chứng khoán, và các Client là các "Máy trạm phân tích" kết nối vào để nhận dữ liệu thời gian thực.
 
-## ✨ Tính năng chính
-- 💬 **Chat văn bản thời gian thực**: Hỗ trợ chat cá nhân và nhóm với độ trễ tối thiểu.
-- 📦 **Giao thức nhị phân (Binary Protocol)**: Header 8-byte tối ưu hóa băng thông.
-- 📂 **Truyền file theo khối (Chunking)**: Hỗ trợ gửi file lớn bằng cách chia nhỏ thành các khối 4KB.
-- ⚡ **Xử lý bất đồng bộ**: Server sử dụng mô hình Non-blocking I/O để xử lý hàng ngàn kết nối đồng thời.
-- 🛡️ **Kiểm tra dữ liệu**: Tích hợp Checksum bảo vệ tính toàn vẹn của gói tin.
-- 📜 **Audit Log**: Ghi lại toàn bộ lịch sử kết nối và hoạt động hệ thống.
+## 🛠️ 2. Tính Năng Chính
+- **Real-time Data Streaming**: Dữ liệu giá nhảy liên tục từng giây qua TCP Socket.
+- **Multi-Client Sync**: Mọi máy trạm đều nhận được dữ liệu đồng bộ từ Server.
+- **Visual Change Detection**: Giao diện tự động đổi màu (Xanh: Tăng, Đỏ: Giảm) giúp theo dõi biến động thị trường tức thì.
 
-## 🛠️ Công nghệ sử dụng
-- **Ngôn ngữ**: C# / .NET
-- **Networking**: System.Net.Sockets (TcpListener, TcpClient)
-- **Kiến trúc**: Asynchronous Pattern (Async/Await)
-- **Protocol**: Custom Binary Data Framing
+## 📂 3. Cấu Trúc Dự Án
+- **Nhom21.FinancialTerminal.Server**: Giả lập dữ liệu và phát sóng (Broadcast).
+- **Nhom21.FinancialTerminal.Client**: Giao diện máy trạm phân tích.
 
-## 📂 Cấu trúc thư mục
-- `VCore.Common`: Thư viện dùng chung (Models, Protocol, Utils).
-- `VCore.Server`: Source code của máy chủ điều phối tin nhắn.
-- `VCore.Client`: Source code của máy khách (Desktop Application).
+## � 4. Hướng Dẫn Chạy
+1. **Chạy Server**: Mở dự án Server và nhấn Start. Server sẽ bắt đầu tạo dữ liệu giả lập.
+2. **Chạy Client**: Mở dự án Client, nhập IP/Port của Server và nhấn Connect.
 
 ---
-*© 2026 - Nhóm 21 - Đồ án Lập trình mạng*
+*Đồ án thực hiện bởi Nhóm 21 - Lập trình ứng dụng mạng.*
+
