@@ -12,6 +12,7 @@ namespace VCore.Server.Core
     public class SocketServer
     {
         private readonly TcpListener _listener;
+        // Danh sách quản lý các Client đang kết nối (Thread-safe)
         private readonly ConcurrentDictionary<string, TcpClient> _clients = new ConcurrentDictionary<string, TcpClient>();
         private bool _isRunning;
 
@@ -20,22 +21,25 @@ namespace VCore.Server.Core
             _listener = new TcpListener(IPAddress.Any, port);
         }
 
+        // Hàm bắt đầu chạy Server
         public async Task StartAsync()
         {
             _listener.Start();
             _isRunning = true;
-            Console.WriteLine($"[SERVER] V-CORE Server started on port {((IPEndPoint)_listener.LocalEndpoint).Port}");
+            AuditLogger.Log($"Server đã khởi động tại cổng {((IPEndPoint)_listener.LocalEndpoint).Port}");
 
             while (_isRunning)
             {
                 try
                 {
+                    // Chấp nhận kết nối mới từ Client
                     TcpClient client = await _listener.AcceptTcpClientAsync();
+                    // Xử lý mỗi Client trên một luồng riêng (Bất đồng bộ)
                     _ = HandleClientAsync(client);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[SERVER ERROR] {ex.Message}");
+                    AuditLogger.Error("Lỗi khi chấp nhận kết nối", ex);
                 }
             }
         }
@@ -43,24 +47,24 @@ namespace VCore.Server.Core
         private async Task HandleClientAsync(TcpClient client)
         {
             string clientId = Guid.NewGuid().ToString();
-            Console.WriteLine($"[SERVER] Client connected: {clientId}");
+            AuditLogger.Log($"Client mới kết nối. Mã ID: {clientId}");
 
             using (client)
             using (NetworkStream stream = client.GetStream())
             {
-                byte[] headerBuffer = new byte[8];
+                byte[] headerBuffer = new byte[8]; // Header luôn có 8 byte theo thiết kế
                 while (_isRunning)
                 {
                     try
                     {
-                        // Read Header (8 bytes)
+                        // Bước 1: Đọc Header để biết kích thước gói tin
                         int bytesRead = await stream.ReadAsync(headerBuffer, 0, 8);
-                        if (bytesRead == 0) break; 
+                        if (bytesRead == 0) break; // Client ngắt kết nối chủ động
 
                         int totalSize = BitConverter.ToInt32(headerBuffer, 0);
                         int payloadSize = totalSize - 8;
 
-                        // Read Payload
+                        // Bước 2: Đọc nốt phần dữ liệu (Payload) dựa trên kích thước đã biết
                         byte[] payloadBuffer = new byte[payloadSize];
                         int totalPayloadRead = 0;
                         while (totalPayloadRead < payloadSize)
@@ -70,26 +74,29 @@ namespace VCore.Server.Core
                             totalPayloadRead += read;
                         }
 
-                        Packet packet = PacketTransporter.Deserialize(headerBuffer, payloadBuffer);
+                        // Giải nén gói tin bằng Helper
+                        Packet packet = PacketHelper.Deserialize(headerBuffer, payloadBuffer);
                         await ProcessPacketAsync(clientId, packet, stream);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[CLIENT ERROR] {clientId}: {ex.Message}");
+                        AuditLogger.Error($"Lỗi khi giao tiếp với Client {clientId}", ex);
                         break;
                     }
                 }
             }
 
             _clients.TryRemove(clientId, out _);
-            Console.WriteLine($"[SERVER] Client disconnected: {clientId}");
+            AuditLogger.Log($"Client đã rời khỏi hệ thống: {clientId}");
         }
 
+        // Hàm xử lý logic cụ thể cho từng loại gói tin
         private async Task ProcessPacketAsync(string clientId, Packet packet, NetworkStream stream)
         {
+            // Kiểm tra tính toàn vẹn ngay khi nhận
             if (!packet.VerifyChecksum())
             {
-                Console.WriteLine($"[SERVER] WARNING: Checksum failed for packet from {clientId}");
+                AuditLogger.Log($"CẢNH BÁO: Checksum không khớp từ {clientId}", "WARNING");
                 return;
             }
 
@@ -97,17 +104,22 @@ namespace VCore.Server.Core
             {
                 case PacketType.Login:
                     string username = Encoding.UTF8.GetString(packet.Payload);
-                    Console.WriteLine($"[SERVER] User logged in: {username} ({clientId})");
+                    AuditLogger.Log($"Người dùng đăng nhập thành công: {username} ({clientId})");
                     break;
 
                 case PacketType.Message:
                     string msg = Encoding.UTF8.GetString(packet.Payload);
-                    Console.WriteLine($"[SERVER] Chat from {clientId}: {msg}");
-                    // Logic to broadcast/route would go here
+                    AuditLogger.Log($"Tin nhắn mới từ {clientId}: {msg}");
+                    
+                    // Gửi ngược lại cho Client để xác nhận (Echo)
+                    byte[] responseData = Encoding.UTF8.GetBytes($"Server đã nhận: {msg}");
+                    Packet response = new Packet(PacketType.Message, responseData);
+                    byte[] serializedResponse = PacketHelper.Serialize(response);
+                    await stream.WriteAsync(serializedResponse, 0, serializedResponse.Length);
                     break;
 
                 case PacketType.Heartbeat:
-                    // Respond with heartbeat or just log
+                    // Server chỉ nhận, có thể phản hồi lại nếu cần
                     break;
             }
         }

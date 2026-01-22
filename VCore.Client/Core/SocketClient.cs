@@ -12,8 +12,10 @@ namespace VCore.Client.Core
         private NetworkStream _stream;
         private bool _isConnected;
 
+        // Sự kiện thông báo khi có gói tin mới từ Server gửi về
         public event Action<Packet> OnPacketReceived;
 
+        // Kết nối tới Server
         public async Task ConnectAsync(string ip, int port)
         {
             _client = new TcpClient();
@@ -21,16 +23,20 @@ namespace VCore.Client.Core
             _stream = _client.GetStream();
             _isConnected = true;
             
+            // Bắt đầu vòng lặp nhận dữ liệu chạy ngầm
             _ = ReceiveLoopAsync();
         }
 
+        // Gửi gói tin lên Server
         public async Task SendPacketAsync(Packet packet)
         {
             if (!_isConnected) return;
-            byte[] data = PacketTransporter.Serialize(packet);
+            // Sử dụng Helper để biến đối tượng thành mảng byte
+            byte[] data = PacketHelper.Serialize(packet);
             await _stream.WriteAsync(data, 0, data.Length);
         }
 
+        // Vòng lặp nhận dữ liệu (luôn lắng nghe Server)
         private async Task ReceiveLoopAsync()
         {
             byte[] headerBuffer = new byte[8];
@@ -38,30 +44,31 @@ namespace VCore.Client.Core
             {
                 while (_isConnected)
                 {
-                    // Read Header
+                    // Đọc tiêu đề (Header)
                     int bytesRead = await _stream.ReadAsync(headerBuffer, 0, 8);
                     if (bytesRead == 0) break;
 
                     int totalSize = BitConverter.ToInt32(headerBuffer, 0);
                     int payloadSize = totalSize - 8;
 
-                    // Read Payload
+                    // Đọc nội dung (Payload)
                     byte[] payloadBuffer = new byte[payloadSize];
                     int totalPayloadRead = 0;
                     while (totalPayloadRead < payloadSize)
                     {
-                        int read = await _stream.ReadAsync(payloadBuffer, totalPayloadRead, payloadSize - payloadPayloadRead);
+                        int read = await _stream.ReadAsync(payloadBuffer, totalPayloadRead, payloadSize - totalPayloadRead);
                         if (read == 0) break;
                         totalPayloadRead += read;
                     }
 
-                    Packet packet = PacketTransporter.Deserialize(headerBuffer, payloadBuffer);
+                    // Chuyển đổi byte về dạng đối tượng để xử lý ở giao diện (UI)
+                    Packet packet = PacketHelper.Deserialize(headerBuffer, payloadBuffer);
                     OnPacketReceived?.Invoke(packet);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[CLIENT] Connection lost: {ex.Message}");
+                Console.WriteLine($"[CLIENT] Mất kết nối tới Server: {ex.Message}");
             }
             finally
             {
@@ -69,6 +76,7 @@ namespace VCore.Client.Core
             }
         }
 
+        // Chủ động ngắt kết nối
         public void Disconnect()
         {
             _isConnected = false;
