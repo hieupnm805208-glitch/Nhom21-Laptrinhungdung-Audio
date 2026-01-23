@@ -61,4 +61,4 @@ Hệ thống truyền thông giọng nói nội bộ (Voice over IP) thời gian
    - Nhập **Server IP** (thường là `127.0.0.1` nếu chạy local) và nhấn **"Connect"**.
    - Nhấn **"Start Call"** để bắt đầu gửi/nhận âm thanh.
 
-*Dự án môn học Lập trình ứng dụng mạng - Năm học 2024-2025*
+*Dự án môn học Lập trình mạng - *
