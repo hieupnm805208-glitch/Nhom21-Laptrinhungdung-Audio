@@ -46,7 +46,8 @@ Hệ thống truyền thông giọng nói nội bộ (Voice over IP) thời gian
      ```bash
      dotnet run
      ```
-   - Server sẽ lắng nghe tại cổng mặc định `11000`.
+   - Giao diện Server sẽ hiện lên. Nhấn nút **"START SERVER"** để bắt đầu lắng nghe kết nối.
+   - Server hoạt động tại cổng mặc định `8888`.
 
 3. **Chạy Client** (Người dùng cuối)
    - Mở một (hoặc nhiều) terminal khác, di chuyển vào thư mục Client:
@@ -60,10 +61,4 @@ Hệ thống truyền thông giọng nói nội bộ (Voice over IP) thời gian
    - Nhập **Server IP** (thường là `127.0.0.1` nếu chạy local) và nhấn **"Connect"**.
    - Nhấn **"Start Call"** để bắt đầu gửi/nhận âm thanh.
 
-## 👥 Thành Viên Nhóm 21
-- **[Tên Thành Viên]** - Trưởng nhóm / Backend
-- **[Tên Thành Viên]** - Frontend / UI Design
-- **[Tên Thành Viên]** - Tester / Documentation
-
----
 *Dự án môn học Lập trình ứng dụng mạng - Năm học 2024-2025*

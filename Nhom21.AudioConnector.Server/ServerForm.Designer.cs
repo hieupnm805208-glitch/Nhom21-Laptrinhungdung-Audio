@@ -18,6 +18,7 @@ namespace Nhom21.AudioConnector.Server
         {
             this.txtLog = new System.Windows.Forms.RichTextBox();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.btnStart = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtLog
@@ -46,6 +47,18 @@ namespace Nhom21.AudioConnector.Server
             this.lblStatus.Text = "Server Status: Initializing...";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // btnStart
+            // 
+            this.btnStart.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnStart.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.btnStart.Location = new System.Drawing.Point(0, 0);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(800, 40);
+            this.btnStart.TabIndex = 2;
+            this.btnStart.Text = "START SERVER";
+            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            // 
             // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -53,6 +66,7 @@ namespace Nhom21.AudioConnector.Server
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.btnStart);
             this.Name = "ServerForm";
             this.Text = "Nhom21 Audio Connector Server";
             this.ResumeLayout(false);
@@ -61,5 +75,6 @@ namespace Nhom21.AudioConnector.Server
 
         private System.Windows.Forms.RichTextBox txtLog;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Button btnStart;
     }
 }

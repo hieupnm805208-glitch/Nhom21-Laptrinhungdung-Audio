@@ -16,8 +16,16 @@ namespace Nhom21.AudioConnector.Server
             this.Load += ServerForm_Load;
         }
 
-        private async void ServerForm_Load(object? sender, EventArgs e)
+        private void ServerForm_Load(object? sender, EventArgs e)
         {
+            UpdateStatus("Server Status: Ready to start. Click 'Start Server' button.");
+        }
+
+        private async void btnStart_Click(object sender, EventArgs e)
+        {
+            if (_isRunning) return;
+            btnStart.Enabled = false;
+            btnStart.Text = "Server Running...";
             await StartServerAsync();
         }
 
